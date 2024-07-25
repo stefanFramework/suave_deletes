@@ -4,11 +4,11 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 setup(
-    name="suave-deletes-stefanframework",
+    name="suave_deletes",
     version="0.0.1",
     packages=find_packages(),
     author="Stefan Framework",
-    description="A simple soft-delete implementation for sqlalchemy ORM",
+    description="A simple soft delete implementation for sqlalchemy",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/stefanFramework/suave-deletes",

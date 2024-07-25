@@ -2,7 +2,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Query, class_mapper
 from sqlalchemy.sql.elements import Null
 
-from sqlalchemy_suave_deletes.mixins import is_soft_delete_supported
+from suave_deletes.mixins import is_soft_delete_supported
 
 
 class SuaveDeleteQuery(Query):

@@ -3,8 +3,8 @@ from datetime import datetime
 from sqlalchemy import Engine, and_
 from sqlalchemy.orm import Session, class_mapper, sessionmaker
 
-from sqlalchemy_suave_deletes.mixins import is_soft_delete_supported
-from sqlalchemy_suave_deletes.query import SuaveDeleteQuery
+from suave_deletes.mixins import is_soft_delete_supported
+from suave_deletes.queries import SuaveDeleteQuery
 
 
 class SuaveDeleteSession(Session):
