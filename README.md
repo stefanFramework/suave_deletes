@@ -43,9 +43,10 @@ def create_session():
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String
 from suave_deletes.mixins import SuaveDeleteMixin
+from suave_deletes.sessions import create_suave_delete_session
 
 DeclarativeBase = declarative_base()
-session = create_session()
+session = create_suave_delete_session()
 
 class Base(DeclarativeBase, SuaveDeleteMixin):
     deleted_at = mapped_column(DateTime, default=None)
