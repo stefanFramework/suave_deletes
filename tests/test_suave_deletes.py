@@ -1,7 +1,8 @@
 import pytest
 
 from sqlalchemy import Column, Integer, String, DateTime, create_engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy import ForeignKey
 
 from suave_deletes.mixins import SuaveDeleteMixin
 from suave_deletes.sessions import create_suave_delete_session
@@ -15,6 +16,29 @@ class User(SuaveDeleteMixin, Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     deleted_at = Column(DateTime)
+
+
+class Workspace(SuaveDeleteMixin, Base):
+    __tablename__ = 'workspaces'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    participants = relationship(
+        "Participant",
+        back_populates="workspace",
+        cascade="all, delete, delete-orphan"
+    )
+    deleted_at = Column(DateTime)
+
+
+class Participant(SuaveDeleteMixin, Base):
+    __tablename__ = 'participants'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    workspace_id = Column(Integer, ForeignKey('workspaces.id'))
+    workspace = relationship("Workspace", back_populates="participants")
+    deleted_at = Column(DateTime, nullable=True)
 
 
 @pytest.fixture(scope='module')
@@ -67,3 +91,23 @@ def test_query_with_soft_delete(session):
 
     assert len(users) == 1
     assert users[0].name == "John"
+
+
+def test_soft_delete_on_participants(session):
+    workspace = Workspace(name="Test Workspace")
+    participant1 = Participant(name="Participant 1", workspace=workspace)
+    participant2 = Participant(name="Participant 2", workspace=workspace)
+
+    workspace.participants.append(participant1)
+    workspace.participants.append(participant2)
+
+    session.add(workspace)
+    session.commit()
+
+    assert len(workspace.participants) == 2
+
+    session.delete(participant1)
+    session.commit()
+
+    assert len(workspace.participants) == 1
+    assert workspace.participants[0].name == "Participant 2"
