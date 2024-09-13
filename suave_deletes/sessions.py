@@ -1,4 +1,4 @@
-from datetime import datetime, UTC
+from datetime import datetime
 
 from sqlalchemy import and_
 from sqlalchemy.engine import Engine
@@ -21,7 +21,7 @@ class SuaveDeleteSession(Session):
 
     def delete(self, instance):
         if is_soft_delete_supported(instance):
-            instance.deleted_at = datetime.now(UTC)
+            instance.deleted_at = datetime.utcnow()
         else:
             super().delete(instance)
 
