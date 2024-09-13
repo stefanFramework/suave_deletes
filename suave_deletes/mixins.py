@@ -1,6 +1,7 @@
 from sqlalchemy import event, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.sql.selectable import Select, Alias
+from sqlalchemy.orm.util import _ORMJoin
 
 
 class SuaveDeleteMixin:
@@ -21,6 +22,9 @@ def before_execute_listener(conn, clause, multi_params, params):
     for from_clause in clause.froms:
 
         if isinstance(from_clause, Alias):
+            continue
+
+        if isinstance(from_clause, _ORMJoin):
             continue
 
         table_name = from_clause.name
