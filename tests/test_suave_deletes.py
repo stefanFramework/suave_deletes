@@ -40,6 +40,13 @@ class Participant(SuaveDeleteMixin, Base):
     workspace = relationship("Workspace", back_populates="participants")
     deleted_at = Column(DateTime, nullable=True)
 
+class Task(Base):
+    __tablename__ = 'tasks'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    workspace_id = Column(Integer, ForeignKey('workspaces.id'))
+
 
 @pytest.fixture(scope='module')
 def engine():
@@ -111,3 +118,15 @@ def test_soft_delete_on_participants(session):
 
     assert len(workspace.participants) == 1
     assert workspace.participants[0].name == "Participant 2"
+
+def test_soft_delete_does_not_activate_if_deleted_at_column_does_not_exist(session):
+    task = Task(name="Test Task")
+
+    session.add(task)
+
+    task = session.query(Task).first()
+    assert task.name == "Test Task"
+
+    session.delete(task)
+    none_existing_task = session.query(Task).first()
+    assert none_existing_task is None

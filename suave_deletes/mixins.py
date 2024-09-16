@@ -1,5 +1,6 @@
 from sqlalchemy import event, text
 from sqlalchemy.engine import Engine
+from sqlalchemy.sql.schema import Table
 from sqlalchemy.sql.selectable import Select, Alias
 from sqlalchemy.orm.util import _ORMJoin
 
@@ -19,15 +20,21 @@ def before_execute_listener(conn, clause, multi_params, params):
             not isinstance(clause.froms, list)):
         return clause, multi_params, params
 
-    for from_clause in clause.froms:
+    for from_element in clause.froms:
 
-        if isinstance(from_clause, Alias):
+        if isinstance(from_element, Alias):
             continue
 
-        if isinstance(from_clause, _ORMJoin):
+        if isinstance(from_element, _ORMJoin):
             continue
 
-        table_name = from_clause.name
+        if not isinstance(from_element, Table):
+            continue
+
+        if not 'deleted_at' in from_element.columns:
+            continue
+
+        table_name = from_element.name
         filter_condition = text(f"{table_name}.deleted_at IS NULL")
         clause = clause.where(filter_condition)
 
