@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="suave_deletes",
-    version="0.1.4",
+    version="0.1.5",
     packages=find_packages(),
     author="Stefan Framework",
     description="A simple soft delete implementation for sqlalchemy",

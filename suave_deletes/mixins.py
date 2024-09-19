@@ -1,16 +1,23 @@
+import logging
 from sqlalchemy import event, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.sql.schema import Table
 from sqlalchemy.sql.selectable import Select, Alias
 from sqlalchemy.orm.util import _ORMJoin
 
+logger = logging.getLogger(__name__)
 
 class SuaveDeleteMixin:
     __use_soft_deletes__ = True
 
 
 def is_soft_delete_supported(instance):
-    return getattr(instance, "__use_soft_deletes__", False) and hasattr(instance, "deleted_at")
+    try:
+        return getattr(instance, "__use_soft_deletes__", False) and hasattr(instance, "deleted_at")
+    except Exception as ex:
+        logger.error(f"Unable to support this instance: {ex}")
+        return False
+
 
 
 @event.listens_for(Engine, "before_execute", retval=True)
